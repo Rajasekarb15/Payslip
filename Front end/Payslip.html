@@ -540,16 +540,9 @@
               </div>
               <div class="form-control">
                 <label>Basic Salary</label>
-                <input type="number" id="basicSalary" oninput="calculateLeaveDays()" />
+                <input type="number" id="basicSalary"  />
               </div> 
-              <div class="form-control">
-                <label>Additions</label>
-                <input type="number" id="additions" oninput="calculateSalary()" />
-              </div>
-              <div class="form-control">
-                <label>Deductions</label>
-                <input type="number" id="deductions" oninput="calculateSalary()" />
-              </div>    
+               
               <div class="form-control">
                 <label>No. of Working Days</label>
                 <input type="number" id="workingDays" oninput="calculateLeaveDays()" />
@@ -562,7 +555,14 @@
                 <label>Total Leave Days</label>
                 <input type="number" id="leaveDays" readonly />
               </div>
-                        
+                <div class="form-control">
+                <label>Additions</label>
+                <input type="number" id="additions" oninput="calculateSalary()" />
+              </div>
+              <div class="form-control">
+                <label>Deductions</label>
+                <input type="number" id="deductions" oninput="calculateSalary()" />
+              </div>           
               <div class="form-control">
                 <label>Total Salary</label>
                 <input type="number" id="totalSalary" readonly />
@@ -637,7 +637,8 @@
       const basic = parseFloat(document.getElementById("basicSalary").value) || 0;
       const add = parseFloat(document.getElementById("additions").value) || 0;
       const deduct = parseFloat(document.getElementById("deductions").value) || 0;
-      const total = basic + add - deduct;
+      const present=parseInt(document.getElementById("presentDays").value)||0;
+      const total = present*basic + add - deduct;
       document.getElementById("totalSalary").value = total.toFixed(2);
     }
 
@@ -674,7 +675,7 @@
   const date = new Date();
   const formattedDate = date.toLocaleDateString('en-GB');
   const month = date.toLocaleString('default', { month: 'long' });
-  const basic = parseFloat(document.getElementById("basicSalary").value) || 0;
+  const basic = parseFloat(document.getElementById("totalSalary").value) || 0;
   const add = parseFloat(document.getElementById("additions").value) || 0;
   const deduct = parseFloat(document.getElementById("deductions").value) || 0;
   const total = basic + add - deduct;
@@ -691,7 +692,7 @@
   document.getElementById("tdAdd").textContent = add.toLocaleString();
   document.getElementById("tdDeduct").textContent = deduct.toLocaleString();
 
-         showSection("payslipPage");
+  showSection("payslipPage");
 
 });
 
@@ -732,4 +733,3 @@
   </script>
 </body>
 </html>
-
