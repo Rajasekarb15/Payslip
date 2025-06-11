@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Employee Portal</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
   <style>
     * {
       margin: 0;
@@ -323,6 +325,65 @@
     section.active {
       display: block;
     }
+.payslip-card {
+  background-color: #fff4cc;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 800px;
+  margin: 20px auto;
+  font-family: 'Arial', sans-serif;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.payslip-card .title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.employee-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.employee-info p {
+  margin: 5px 0;
+}
+.payslip-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 15px;
+}
+.payslip-table th, .payslip-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+}
+.payslip-table th {
+  background-color: #fcd34d;
+}
+.total-earnings {
+  text-align: right;
+  font-weight: bold;
+  font-size: 18px;
+  margin-top: 10px;
+}
+.button-row {
+  text-align: center;
+  margin-top: 20px;
+}
+.btn-save, .btn-download {
+  background-color: #facc15;
+  color: #000;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  margin: 0 10px;
+  cursor: pointer;
+}
+.btn-download {
+  background-color: #374151;
+  color: #fff;
+}
+
+
   </style>
 </head>
 <body>
@@ -349,7 +410,7 @@
         <ul>
           <li class="nav-link active" data-target="Overview">Overview</li>
           <li class="nav-link" data-target="Payroll">Payroll</li>
-          <li onclick="showSection('payslipPage')">Payslip</li>
+           <li onclick="showSection('payslipPage')">Payslip</li>
         </ul>
       </aside>
       <main class="main-content">
@@ -451,7 +512,7 @@
           </div>
         </section>
 
-        <section id="Payroll">
+         <section id="Payroll">
           <div class="header-bar">
             <h2>Payroll Details</h2>
             <div class="top-buttons">
@@ -461,44 +522,114 @@
           </div>
           <div class="form-container">
             <div class="form-group">
-              <div class="form-control"><label>Employee Name</label><input type="text" id="empName" /></div>
-              <div class="form-control"><label>Employee Role</label><input type="text" id="empRole" /></div>
-              <div class="form-control"><label>Employee Id</label><input type="text" id="empId" /></div>
-              <div class="form-control"><label>Date</label><input type="date" /></div>
-              <div class="form-control"><label>Basic Salary</label><input type="number" id="basicSalary" oninput="calculateSalary()" /></div>
-              <div class="form-control"><label>Total Salary</label><input type="number" id="totalSalary" readonly /></div>
-              <div class="form-control"><label>No of Working Days</label><input type="number" /></div>
-              <div class="form-control"><label>Total Present Days</label><input type="number" /></div>
-              <div class="form-control"><label>Total Leave Days</label><input type="number" /></div>
-              <div class="form-control"><label>Additions</label><input type="number" id="additions" oninput="calculateSalary()" /></div>
-              <div class="form-control"><label>Deductions</label><input type="number" id="deductions" oninput="calculateSalary()" /></div>
+              <div class="form-control">
+                <label>Employee Name</label>
+                <input type="text" id="empName" />
+              </div>
+              <div class="form-control">
+                <label>Employee Role</label>
+                <input type="text" id="empRole" />
+              </div>
+              <div class="form-control">
+                <label>Employee ID</label>
+                <input type="text" id="empId" />
+              </div>
+              <div class="form-control">
+                <label>Date</label>
+                <input type="date" id="empDate" />
+              </div>
+              <div class="form-control">
+                <label>Basic Salary</label>
+                <input type="number" id="basicSalary" oninput="calculateLeaveDays()" />
+              </div>    
+              <div class="form-control">
+                <label>No. of Working Days</label>
+                <input type="number" id="workingDays" oninput="calculateLeaveDays()" />
+              </div>
+              <div class="form-control">
+                <label>Total Present Days</label>
+                <input type="number" id="presentDays" oninput="calculateLeaveDays()" />
+              </div>
+              <div class="form-control">
+                <label>Total Leave Days</label>
+                <input type="number" id="leaveDays" readonly />
+              </div>
+               <div class="form-control">
+                <label>Additions</label>
+                <input type="number" id="additions" oninput="calculateSalary()" />
+              </div>
+              <div class="form-control">
+                <label>Deductions</label>
+                <input type="number" id="deductions" oninput="calculateSalary()" />
+              </div>             
+              <div class="form-control">
+                <label>Total Salary</label>
+                <input type="number" id="totalSalary" readonly />
+              </div>
             </div>
             <div class="form-buttons">
               <button class="submit-btn">Submit Payroll</button>
-              <button class="cancel-btn">Cancel</button>
+              <button type="button" class="cancel-btn">Cancel</button>
             </div>
           </div>
+   </main>
         </section>
-      </main>
+   
     </div>
   </div>
 
-  <!-- PAYSLIP -->
-  <div class="payslip" id="payslipPage">
-    <h2>Employee Payslip</h2>
-    <table>
-      <tr><th>Employee Name</th><td id="psEmpName"></td></tr>
-      <tr><th>Employee ID</th><td id="psEmpId"></td></tr>
-      <tr><th>Role</th><td id="psRole"></td></tr>
-      <tr><th>Date</th><td id="psDate"></td></tr>
-      <tr><th>Basic Salary</th><td id="psBasic"></td></tr>
-      <tr><th>Additions</th><td id="psAdd"></td></tr>
-      <tr><th>Deductions</th><td id="psDeduct"></td></tr>
-      <tr><th>Total Salary</th><td id="psTotal"></td></tr>
+
+
+  <div class="payslip-card" id="payslipPage" style="display: none;">
+    <h2 class="title">Payslip Details</h2>
+
+    <div class="employee-info">
+      <div>
+        <p><strong>Employee Name</strong> : <span id="psEmpName"></span></p>
+        <p><strong>Employee I’D</strong> : <span id="psEmpId"></span></p>
+        <p><strong>Role</strong> : <span id="psRole"></span></p>
+      </div>
+      <div>
+        <p><strong>Date</strong> : <span id="psDate"></span></p>
+        <p><strong>Month</strong> : <span id="psMonth"></span></p>
+      </div>
+    </div>
+
+    <table class="payslip-table">
+      <thead>
+        <tr>
+          <th colspan="2">Employee Details</th>
+          <th colspan="2">Earnings</th>
+          <th>Additions</th>
+          <th>Deductions</th>
+        </tr>
+        <tr>
+          <th>Employee I’d</th>
+          <th>Employee Name</th>
+          <th>Basic salary</th>
+          <th>Total Salary</th>
+          <th>Amount</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td id="tdEmpId"></td>
+          <td id="tdEmpName"></td>
+          <td id="tdBasic"></td>
+          <td id="tdTotal"></td>
+          <td id="tdAdd"></td>
+          <td id="tdDeduct"></td>
+        </tr>
+      </tbody>
     </table>
-    <br />
-    <button onclick="showSection('dashboardPage')">Back to Dashboard</button>
+    <div class="total-earnings">Total Earnings: ₹ <span id="psTotal"></span></div>
+    <div class="button-row">
+      <button class="btn-save">Save</button>
+      <button class="btn-download">Download</button>
+    </div>
   </div>
+
 
   <script>
     function calculateSalary() {
@@ -519,34 +650,50 @@
         alert("Please enter both fields.");
       }
     }
-
+    function calculateLeaveDays() {
+      const working = parseInt(document.getElementById("workingDays").value) || 0;
+      const present = parseInt(document.getElementById("presentDays").value) || 0;
+      const basicsalry=parseInt(document.getElementById("basicSalary").value);
+      const leave = working - present;
+        const total=present*basicsalry;   
+      document.getElementById("leaveDays").value = leave;
+       document.getElementById("totalSalary").value=total;
+    }
+   
     function showSection(id) {
       document.getElementById("dashboardPage").style.display = "none";
       document.getElementById("payslipPage").style.display = "none";
       document.getElementById(id).style.display = "block";
     }
 
-    document.querySelector(".submit-btn").addEventListener("click", function () {
-      const name = document.getElementById("empName").value || "Deepika";
-      const role = document.getElementById("empRole").value || "Team Lead";
-      const empId = document.getElementById("empId").value || "0101";
-      const date = new Date().toLocaleDateString('en-GB');
-      const basic = parseFloat(document.getElementById("basicSalary").value) || 0;
-      const add = parseFloat(document.getElementById("additions").value) || 0;
-      const deduct = parseFloat(document.getElementById("deductions").value) || 0;
-      const total = basic + add - deduct;
+  document.querySelector(".submit-btn").addEventListener("click", function () {
+  const name = document.getElementById("empName").value;
+  const role = document.getElementById("empRole").value;
+  const empId = document.getElementById("empId").value;
+  const date = new Date();
+  const formattedDate = date.toLocaleDateString('en-GB');
+  const month = date.toLocaleString('default', { month: 'long' });
+  const basic = parseFloat(document.getElementById("basicSalary").value) || 0;
+  const add = parseFloat(document.getElementById("additions").value) || 0;
+  const deduct = parseFloat(document.getElementById("deductions").value) || 0;
+  const total = basic + add - deduct;
+  document.getElementById("psEmpName").textContent = name;
+  document.getElementById("psEmpId").textContent = empId;
+  document.getElementById("psRole").textContent = role;
+  document.getElementById("psDate").textContent = formattedDate;
+  document.getElementById("psMonth").textContent = month;
+  document.getElementById("psTotal").textContent = total.toLocaleString();
+  document.getElementById("tdEmpId").textContent = empId;
+  document.getElementById("tdEmpName").textContent = name;
+  document.getElementById("tdBasic").textContent = basic.toLocaleString();
+  document.getElementById("tdTotal").textContent = (basic).toLocaleString();
+  document.getElementById("tdAdd").textContent = add.toLocaleString();
+  document.getElementById("tdDeduct").textContent = deduct.toLocaleString();
 
-      document.getElementById("psEmpName").textContent = name;
-      document.getElementById("psEmpId").textContent = empId;
-      document.getElementById("psRole").textContent = role;
-      document.getElementById("psDate").textContent = date;
-      document.getElementById("psBasic").textContent = basic.toFixed(2);
-      document.getElementById("psAdd").textContent = add.toFixed(2);
-      document.getElementById("psDeduct").textContent = deduct.toFixed(2);
-      document.getElementById("psTotal").textContent = total.toFixed(2);
+         showSection("payslipPage");
 
-      showSection("payslipPage");
-    });
+});
+
 
     const navLinks = document.querySelectorAll('.nav-link');
     const pageSections = document.querySelectorAll('.main-content section');
@@ -565,6 +712,23 @@
         }
       });
     });
+ 
+  document.querySelector(".btn-download").addEventListener("click", function () {
+    const element = document.getElementById("payslipPage");
+    element.style.display = "block";
+    const opt = {
+      margin:       0.5,
+      filename:     'Payslip.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save().then(() => {
+      element.style.display = "none";
+    });
+  });
+
   </script>
 </body>
 </html>
+
